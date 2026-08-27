@@ -1,0 +1,133 @@
+{
+  "theme_and_vibe": {
+    "theme": "light",
+    "archetype": "ORGANIC & EARTHY (Trust, Growth, Calm)",
+    "description": "A highly professional, administrative compliance SaaS dashboard for a veterinary complementary medicine association. It must feel trustworthy, grounded, and clear. Avoid generic Vercel/Stripe tech vibes. Use organic colors, solid structural grayscale, and tactile surfaces.",
+    "interface_language": "Dutch"
+  },
+  "typography": {
+    "font_family": {
+      "heading": "'Work Sans', sans-serif",
+      "body": "'IBM Plex Sans', sans-serif"
+    },
+    "rules": {
+      "headings": "Use tracking-tight for all headings above 24px. Use Work Sans in medium to semi-bold weights for clear administrative hierarchy.",
+      "body": "Use IBM Plex Sans for maximum legibility in data-dense tables and forms. tracking-normal, leading-relaxed.",
+      "labels": "Uppercase, tiny text (text-xs), wide spacing (tracking-widest) for overlines and form labels.",
+      "forbidden_fonts": ["Inter", "Space Grotesk", "Roboto"]
+    }
+  },
+  "colors": {
+    "background": {
+      "app": "#F9F9F6",
+      "card": "#FFFFFF",
+      "sidebar": "#1E3F33"
+    },
+    "primary": {
+      "DEFAULT": "#1E3F33",
+      "hover": "#2C5C4B",
+      "foreground": "#FFFFFF",
+      "description": "Deep Forest Green for primary actions and brand elements."
+    },
+    "secondary": {
+      "DEFAULT": "#8A9A86",
+      "hover": "#778773",
+      "foreground": "#1E3F33",
+      "description": "Sage Green for secondary actions and subtle highlights."
+    },
+    "accent": {
+      "DEFAULT": "#D97757",
+      "hover": "#C06548",
+      "foreground": "#FFFFFF",
+      "description": "Terracotta for notifications, action-required elements, and warnings."
+    },
+    "neutral": {
+      "50": "#F9F9F6",
+      "100": "#F0EEE4",
+      "200": "#E2DFD3",
+      "300": "#C5C1B1",
+      "400": "#A39E8C",
+      "500": "#7A7563",
+      "600": "#5C584A",
+      "700": "#4A463B",
+      "800": "#3F3D35",
+      "900": "#36342E"
+    },
+    "status": {
+      "concept": { "bg": "#F0EEE4", "text": "#4A463B", "label": "Concept" },
+      "ingediend": { "bg": "#DBEAFE", "text": "#1E40AF", "label": "Ingediend" },
+      "in_beoordeling": { "bg": "#F3E8FF", "text": "#6B21A8", "label": "In beoordeling" },
+      "aanpassing_gevraagd": { "bg": "#FFEDD5", "text": "#9A3412", "label": "Aanpassing gevraagd" },
+      "goedgekeurd": { "bg": "#DCFCE7", "text": "#166534", "label": "Goedgekeurd" },
+      "afgekeurd": { "bg": "#FEE2E2", "text": "#991B1B", "label": "Afgekeurd" }
+    }
+  },
+  "layouts": {
+    "dashboard_grid": {
+      "type": "High Density Grid (Bento Protocol Mode B)",
+      "spacing": "Tight (gap-6)",
+      "structure": [
+        "Top Level (col-span-full): 'Wat moet ik nog doen?' (What do I still need to do?) call-to-action banner. Use a soft background (e.g., neutral-100) with a prominent Terracotta action button if tasks are pending.",
+        "Middle Level (col-span-1 md:col-span-2): Progress tracking widgets. Circular progress rings for 'Bijscholingspunten' (6/8) and 'Consulten' (34/40).",
+        "Middle Level (col-span-1 md:col-span-2): Deadlines / Calendar countdown ('Dagen tot deadline').",
+        "Bottom Level (col-span-full): Recent activity list (Recente registraties) showing status badges."
+      ]
+    },
+    "admin_dashboard_grid": {
+      "type": "Action-Oriented Queue List",
+      "structure": [
+        "Top Level: Quick metric cards (col-span-1) for 'Bijscholingen ter beoordeling', 'Jaarformulieren ter controle', 'Leden met achterstand'.",
+        "Main Level: Dense data tables using standard shadcn/ui table components with clear status badges and inline 'Beoordelen' (Review) actions."
+      ]
+    },
+    "surfaces": {
+      "cards": "Cardless or max 8px border-radius. Use flat backgrounds with 1px border-neutral-200. No heavy drop shadows. Keep it tactile (Neumorphism mixed with flat design - soft ambient shadow shadow-sm, 1px border to ground it).",
+      "headers": "Solid background with a hard bottom border. Do NOT use transparent headers over content."
+    }
+  },
+  "components_and_features": {
+    "forms": "Use Shadcn/UI inputs, selects, and textareas. Use tight vertical spacing for dense administrative input. Labels must be clear Dutch terminology.",
+    "document_upload": "Drag-and-drop zone with dashed borders. Show file name and size upon upload.",
+    "progress_indicators": "Use SVG-based circular progress rings for continuing education points (bijscholingspunten) and consults.",
+    "annual_overview_pdf": "A visually distinct section that previews the 'Jaaroverzicht' (Annual Overview) looking like an official document (white background, serif headers for print feel, strict grid) before the user clicks 'Indienen' (Submit).",
+    "audit_trail": "A vertical timeline component showing history of a registration (e.g., Ingediend -> In beoordeling -> Aanpassing gevraagd)."
+  },
+  "media": {
+    "images": {
+      "vet_examining_dog": {
+        "url": "https://images.unsplash.com/photo-1770836037816-4445dbd449fd?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA2ODl8MHwxfHNlYXJjaHwzfHx2ZXRlcmluYXJ5JTIwcHJvZmVzc2lvbmFsJTIwcG9ydHJhaXR8ZW58MHx8fHwxNzg3ODE2NDQ4fDA&ixlib=rb-4.1.0&q=85",
+        "description": "Veterinarian examines a dachshund. Use for the login/auth screen background or onboarding hero."
+      },
+      "male_vet_avatar": {
+        "url": "https://images.unsplash.com/photo-1612531385446-f7e6d131e1d0?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA2ODl8MHwxfHNlYXJjaHw0fHx2ZXRlcmluYXJ5JTIwcHJvZmVzc2lvbmFsJTIwcG9ydHJhaXR8ZW58MHx8fHwxNzg3ODE2NDQ4fDA&ixlib=rb-4.1.0&q=85",
+        "description": "Professional male vet portrait. Use as the default logged-in member avatar."
+      },
+      "female_vet_avatar": {
+        "url": "https://images.unsplash.com/photo-1594824476967-48c8b964273f?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA2ODl8MHwxfHNlYXJjaHwxfHx2ZXRlcmluYXJ5JTIwcHJvZmVzc2lvbmFsJTIwcG9ydHJhaXR8ZW58MHx8fHwxNzg3ODE2NDQ4fDA&ixlib=rb-4.1.0&q=85",
+        "description": "Professional female vet portrait. Use for admin avatar."
+      }
+    },
+    "icons": {
+      "library": "lucide-react",
+      "instruction": "Use clean, consistent line icons. For the member dashboard, emphasize action icons like CheckCircle, AlertTriangle, FileText, Upload."
+    }
+  },
+  "motion": {
+    "hover_states": "All interactive elements (buttons, table rows) must have subtle background color transitions. e.g., hover:bg-neutral-100.",
+    "lists": "Stagger entrance animations for admin queue items using Framer Motion.",
+    "progress_rings": "Animate the stroke-dashoffset of progress rings on mount to visually 'fill up' to the user's current points/consults."
+  },
+  "universal_guidelines_for_main_agent": [
+    "CRITICAL: Generate `.js` and `.jsx` files, NOT `.tsx`. Do not use TypeScript syntax.",
+    "All labels and text must be in Dutch (e.g., 'Bijscholingen', 'Consulten', 'Jaarformulier', 'Beoordelen', 'Indienen').",
+    "All interactive elements (buttons, inputs, links, tabs) MUST include a `data-testid` attribute (e.g., `data-testid=\"submit-jaarformulier-button\"`).",
+    "Do not use generic centered layouts. Use left-aligned dense grids for professional administrative systems.",
+    "Do NOT use transparent backgrounds in headers or dropdowns. Ensure solid contrast.",
+    "Use 2-3x more generous spacing (p-6, p-8) around forms and structural containers to avoid a cramped CRUD look.",
+    "Use Lucide-react for icons.",
+    "Use sonner for toast notifications.",
+    "Never use `transition: all`. Specify exact properties (e.g., `transition-colors`, `transition-transform`).",
+    "Avoid the standard 'SaaS Blue'. Use the specified Forest Green / Sage palette for a veterinary/natural medicine vibe.",
+    "Ensure 'What do I need to do?' is always the most prominent visual element on the Member dashboard."
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "summary": "Full e2e test of BCND Jaarformulier & Nascholingsadministratie. Backend: 24/24 pytest passed (auth, authz, member/admin endpoints, listings, settings, logout). Frontend: admin login->/admin dashboard OK, member login->/ dashboard shows 8/8 pts + 34/40 consults + banner OK, member can create new bijscholing (status Ingediend), consulten update auto-computes total and save toast shows, jaarformulier page loads with member data, notifications panel opens and lists items, admin can review+approve training (status flips to Goedgekeurd, notification is generated), admin settings/members/jaarformulieren pages load with expected data-testid buttons, authz enforced (member GET on /admin routes redirected to /, /admin/dashboard etc return 401/403 for member).",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "GET /api/settings/public", "issue": "Requires authenticated user; misleading naming '/public' suggests unauthenticated access. Currently returns 401 anonymous."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Bijscholing registreren dialog (Nieuwe bijscholing)", "issues": ["'Datum' field uses native browser date input (type=date) instead of shadcn Calendar/DatePicker component; inconsistent with rest of the design and against the internal guideline to avoid browser native picker."]}
+    ]
+  },
+  "test_report_links": ["/app/backend/tests/backend_test.py", "/app/test_reports/pytest/pytest_results.xml"],
+  "action_items": [
+    "Optional: replace native <input type=\"date\"> in 'Nieuwe bijscholing' dialog with shadcn Calendar/DatePicker (data-testid=training-date preserved).",
+    "Consider making /api/settings/public truly public (no auth) or rename to reflect that it requires auth."
+  ],
+  "critical_code_review_comments": [
+    "auth_routes.login returns flat user object; frontend Login expects u.role directly so this is consistent, but standardising as {user: {...}, token?} would be more conventional.",
+    "annual_forms.py: _get_or_create_form inserts a new form on every GET when none exists (side effect on read); consider making the endpoint idempotent or explicit.",
+    "settings_routes.py: '/settings/public' name is misleading; it still calls get_current_user."
+  ],
+  "updated_files": ["/app/backend/tests/backend_test.py"],
+  "success_rate": {"backend": "100%", "frontend": "100%"},
+  "test_credentials": "Admin: bojan.vanderheide@gmail.com / BcndAdmin2026!  |  Member: lid@bcnd-demo.nl / Lid2026!",
+  "seed_data_creation": "During testing a member training 'TEST Onderwerp' (Externe bijscholing, 15-05-2026) was created and admin-approved with 4 pt / remark 'TEST goedkeuring'. Consults were briefly changed to 20/15 then reverted to original 20/14.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Backend pytest at /app/backend/tests/backend_test.py covers auth, authz, listings for both admin+member sessions. Existing seed member is Marloes de Vries (licence year 4, norms 40 consults/8 pt). Notifications endpoint returns dict {items:[], unread:n} not a bare list. Admin routes prefix is /api/admin (dashboard, review-queue). Annual-form admin list is at /api/annual-forms/admin/list. Member consults GET requires ?year=YYYY query param.",
+  "rca of the issue": "No blocking issues found. Only cosmetic/consistency observations (native date input, /settings/public naming)."
+}

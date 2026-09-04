@@ -19,7 +19,12 @@ export default function Login() {
     try {
       const u = await login(email, password);
       navigate(u.role === "admin" ? "/admin" : "/");
-    } catch (_) {} finally { setLoading(false); }
+    } catch (err) {
+      // The error message is surfaced via the auth context (shown under the form).
+      console.error("Login mislukt:", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

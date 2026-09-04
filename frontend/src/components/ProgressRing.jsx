@@ -1,5 +1,7 @@
 import { motion } from "framer-motion";
 
+const RING_TRANSITION = { duration: 1, ease: "easeOut" };
+
 export function ProgressRing({ value, max, label, sublabel, complete, size = 140, testid }) {
   const pct = max === 0 ? 100 : Math.min(100, Math.round(((value || 0) / max) * 100));
   const radius = (size - 16) / 2;
@@ -17,7 +19,7 @@ export function ProgressRing({ value, max, label, sublabel, complete, size = 140
             strokeLinecap="round" strokeDasharray={circ}
             initial={{ strokeDashoffset: circ }}
             animate={{ strokeDashoffset: offset }}
-            transition={{ duration: 1, ease: "easeOut" }}
+            transition={RING_TRANSITION}
           />
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">

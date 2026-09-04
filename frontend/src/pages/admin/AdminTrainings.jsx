@@ -115,6 +115,7 @@ export default function AdminTrainings() {
 
 function ReviewSheet({ training, onClose, onChange }) {
   const [points, setPoints] = useState("");
+  const [pointsEdited, setPointsEdited] = useState(false);
   const [remark, setRemark] = useState("");
   const [history, setHistory] = useState([]);
   const [busy, setBusy] = useState(false);
@@ -122,6 +123,7 @@ function ReviewSheet({ training, onClose, onChange }) {
   useEffect(() => {
     if (!training) return;
     setPoints(training.points != null ? String(training.points) : "");
+    setPointsEdited(false);
     setRemark("");
     api.get(`/trainings/${training.id}/history`).then(({ data }) => setHistory(data)).catch(() => {});
   }, [training]);
@@ -130,8 +132,11 @@ function ReviewSheet({ training, onClose, onChange }) {
   const act = async (action) => {
     setBusy(true);
     try {
+      // Only send points when the admin actually changed the field, so approving
+      // an already-graded training never silently overwrites its stored points.
+      const pointsPayload = pointsEdited ? (points === "" ? null : parseFloat(points)) : null;
       await api.post(`/trainings/${training.id}/review`, {
-        action, points: points === "" ? null : parseFloat(points), remark,
+        action, points: pointsPayload, remark,
       });
       toast.success("Beoordeling opgeslagen");
       onChange(); onClose();
@@ -168,7 +173,7 @@ function ReviewSheet({ training, onClose, onChange }) {
             <div>
               <Label className="overline text-neutral-600">Toegekende punten</Label>
               <Input type="number" step="0.5" className="mt-1.5" data-testid="assign-points" value={points}
-                onChange={(e) => setPoints(e.target.value)} />
+                onChange={(e) => { setPoints(e.target.value); setPointsEdited(true); }} />
             </div>
           </div>
           <div>

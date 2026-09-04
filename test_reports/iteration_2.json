@@ -1,0 +1,23 @@
+{
+  "summary": "Frontend-only regression test after code-quality fixes (AuthContext useMemo/useCallback, Login console.error, ProgressRing RING_TRANSITION). All 5 regression scenarios verified against live preview URL. Auth (admin + member), session persistence across all member pages, wrong-password error, logout via sidebar, member->admin approval flow, and points reflection on member dashboard all work correctly. No regressions detected.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "Minor a11y warning in browser console: Radix DialogContent for 'Bijscholing registreren' is missing a `Description`/`aria-describedby` — add a <DialogDescription> to silence the warning and improve screen-reader UX.",
+    "Admin review dialog defaults `assign-points` to the currently stored value even for already Goedgekeurd trainings; clicking Beoordelen->Goedkeuren on an approved training with the default value silently overwrites previously assigned points (observed: TEST Onderwerp 4pt -> 3pt). Consider disabling the approve button when status is already Goedgekeurd, or requiring an explicit confirm."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "n/a (not tested)", "frontend": "100%"},
+  "test_credentials": "Admin bojan.vanderheide@gmail.com / BcndAdmin2026! and Member lid@bcnd-demo.nl / Lid2026! both valid.",
+  "seed_data_creation": "Created one training via UI: 'REGRESSION Test Training 2026' (15-01-2026, TEST Regressie Org, 3h) — currently in Ingediend status in the admin queue.",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Regression pass complete on preview URL. Verified: admin login lands on /admin with metric cards + review queues; member login lands on / with 'Wat moet ik nog doen?' banner and both ProgressRing (Bijscholingspunten 12/8 -> 11/8 after approval, Consulten 34/40) rendering correctly (9 SVG circle elements); AuthContext keeps user across /bijscholingen, /consulten, /jaarformulier, /profiel navigation; sidebar Uitloggen returns to /login for both roles; wrong-password shows Dutch 'Onjuiste inloggegevens' under login-error and Login catch now logs 'Login mislukt: Error: Onjuiste inloggegevens' via console.error; member successfully created a bijscholing via new-training-button dialog and it appeared with status Ingediend; admin approve-button on /admin/bijscholingen produced 'Beoordeling opgeslagen' toast and member dashboard ring points updated. Correct member training-form testids: training-date, training-hours, training-organization, training-subject, training-content, training-speaker, training-remarks, submit-training-button.",
+  "rca of the issue": "No issues to RCA."
+}

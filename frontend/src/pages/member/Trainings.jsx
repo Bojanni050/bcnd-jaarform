@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter,
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger, DialogFooter,
 } from "@/components/ui/dialog";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
@@ -61,7 +61,9 @@ export default function Trainings() {
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
-            <DialogHeader><DialogTitle className="font-heading text-forest">Bijscholing registreren</DialogTitle></DialogHeader>
+            <DialogHeader><DialogTitle className="font-heading text-forest">Bijscholing registreren</DialogTitle>
+              <DialogDescription>Vul de gegevens van uw gevolgde bij- of nascholing in. De administratie kent uiteindelijk de punten toe.</DialogDescription>
+            </DialogHeader>
             <div className="space-y-3.5 py-2">
               <div className="grid grid-cols-2 gap-3">
                 <Field label="Datum *"><Input type="date" data-testid="training-date" value={form.date}

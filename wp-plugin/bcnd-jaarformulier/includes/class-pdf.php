@@ -83,7 +83,10 @@ class BCND_PDF {
             $this->paragraph($form['deviation_reason']);
         }
 
-        $this->y -= 20;
+        // Ondertekening / akkoord
+        $this->signature_block($form);
+
+        $this->y -= 14;
         $this->hline($this->y);
         $this->y -= 14;
         $this->paragraph('Automatisch gegenereerd door de BCND Nascholingsadministratie op ' . date_i18n('d-m-Y H:i') .
@@ -95,6 +98,34 @@ class BCND_PDF {
     }
 
     /* ---------- layout helpers ---------- */
+
+    private function signature_block($form) {
+        $this->ensure(150);
+        $this->y -= 6;
+        $this->section('Ondertekening');
+        $this->paragraph('Ondergetekende verklaart dit jaarformulier naar waarheid en volledig te hebben ingevuld.', 9);
+        $this->y -= 26;
+
+        $lineY = $this->y;
+        $this->sigline($this->marginX, 210, $lineY);
+        $this->sigline($this->marginX + 305, 200, $lineY);
+        $this->y -= 12;
+        $this->text('Plaats en datum', $this->marginX, $this->y, 8, false, '5C584A');
+        $this->text('Handtekening licentielid', $this->marginX + 305, $this->y, 8, false, '5C584A');
+        $this->y -= 30;
+
+        if (!empty($form['status']) && $form['status'] === 'goedgekeurd') {
+            $this->ensure(40);
+            $reviewer = !empty($form['reviewed_by']) ? $form['reviewed_by'] : 'BCND administratie';
+            $date = !empty($form['reviewed_at']) ? substr((string) $form['reviewed_at'], 0, 10) : date_i18n('Y-m-d');
+            $this->text('Akkoord BCND administratie: ' . $reviewer . '  —  ' . $date, $this->marginX, $this->y, 9, true, '1E3F33');
+            $this->y -= 18;
+        }
+    }
+
+    private function sigline($x, $width, $y) {
+        $this->cur .= sprintf("0.55 0.55 0.55 RG 0.6 w %F %F m %F %F l S\n", $x, $y, $x + $width, $y);
+    }
 
     private function section($title) {
         $this->ensure(40);

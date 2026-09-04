@@ -27,9 +27,36 @@ class BCND_Notifications {
         if (!empty($settings['notifications_enabled'])) {
             $user = get_userdata($user_id);
             if ($user && $user->user_email) {
-                wp_mail($user->user_email, '[BCND] ' . $title, $message);
+                $headers = [
+                    'Content-Type: text/html; charset=UTF-8',
+                    'From: ' . self::from_name() . ' <' . self::from_address() . '>',
+                ];
+                wp_mail($user->user_email, '[BCND] ' . $title, self::html_email($title, $message), $headers);
             }
         }
+    }
+
+    private static function from_name() {
+        $name = get_bloginfo('name');
+        return $name ? $name . ' — BCND' : 'BCND Nascholingsadministratie';
+    }
+
+    private static function from_address() {
+        $admin = get_option('admin_email');
+        return $admin ? $admin : ('noreply@' . wp_parse_url(home_url(), PHP_URL_HOST));
+    }
+
+    private static function html_email($title, $message) {
+        $t = esc_html($title);
+        $m = nl2br(esc_html($message));
+        return '<div style="font-family:Arial,Helvetica,sans-serif;max-width:560px;margin:0 auto;border:1px solid #E2DFD3;border-radius:10px;overflow:hidden">'
+            . '<div style="background:#1E3F33;color:#fff;padding:18px 24px;font-size:18px;font-weight:bold">BCND Nascholingsadministratie</div>'
+            . '<div style="padding:24px">'
+            . '<h2 style="color:#1E3F33;font-size:16px;margin:0 0 12px">' . $t . '</h2>'
+            . '<p style="color:#4A463B;font-size:14px;line-height:1.6;margin:0">' . $m . '</p>'
+            . '</div>'
+            . '<div style="background:#F0EEE4;color:#7A7563;padding:14px 24px;font-size:11px">Dit is een automatisch bericht van de BCND Nascholingsadministratie.</div>'
+            . '</div>';
     }
 
     public static function notify_admins($type, $title, $message, $related = []) {

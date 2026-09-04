@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
-import api from "@/lib/api";
+import api, { IS_WP } from "@/lib/api";
 import {
   LayoutDashboard, GraduationCap, Stethoscope, FileText, User, LogOut,
   Users, ClipboardCheck, Settings as SettingsIcon, Bell, Leaf, ShieldCheck,
@@ -42,7 +42,7 @@ export function AppLayout({ children }) {
   return (
     <div className="min-h-screen flex">
       {/* Sidebar */}
-      <aside className="w-64 shrink-0 bg-[#1E3F33] text-white flex-col hidden md:flex fixed h-screen">
+      <aside className={`w-64 shrink-0 bg-[#1E3F33] text-white flex-col hidden md:flex ${IS_WP ? "md:sticky md:top-0 md:self-start md:h-screen" : "fixed h-screen"}`}>
         <div className="px-6 py-6 border-b border-white/10 flex items-center gap-2.5">
           <div className="h-9 w-9 rounded-lg bg-terracotta flex items-center justify-center">
             <Leaf className="h-5 w-5 text-white" />
@@ -87,7 +87,7 @@ export function AppLayout({ children }) {
       </aside>
 
       {/* Main */}
-      <div className="flex-1 md:ml-64 min-w-0">
+      <div className={`flex-1 min-w-0 ${IS_WP ? "" : "md:ml-64"}`}>
         <header className="sticky top-0 z-20 bg-white border-b border-neutral-200 px-5 md:px-8 py-3.5 flex items-center justify-between">
           <div className="md:hidden font-heading font-semibold text-forest">BCND</div>
           <div className="hidden md:block text-sm text-neutral-500">

@@ -1,9 +1,10 @@
 import "@/App.css";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, HashRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
 import { AppLayout } from "@/components/AppLayout";
 import { Toaster } from "@/components/ui/sonner";
-import { Loader2 } from "lucide-react";
+import { Loader2, Leaf } from "lucide-react";
+import { IS_WP } from "@/lib/api";
 
 import Login from "@/pages/Login";
 import MemberDashboard from "@/pages/member/MemberDashboard";
@@ -17,10 +18,31 @@ import AdminAnnualForms from "@/pages/admin/AdminAnnualForms";
 import AdminMembers from "@/pages/admin/AdminMembers";
 import AdminSettings from "@/pages/admin/AdminSettings";
 
+const Router = IS_WP ? HashRouter : BrowserRouter;
+
 function Loading() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-bone">
+    <div className="min-h-[60vh] flex items-center justify-center bg-bone">
       <Loader2 className="h-6 w-6 animate-spin text-forest" />
+    </div>
+  );
+}
+
+function LoginPrompt() {
+  return (
+    <div className="min-h-[70vh] flex items-center justify-center bg-bone p-6">
+      <div className="max-w-sm w-full text-center bg-white border border-neutral-200 rounded-xl p-8">
+        <div className="h-12 w-12 rounded-xl bg-forest flex items-center justify-center mx-auto mb-4">
+          <Leaf className="h-6 w-6 text-white" />
+        </div>
+        <h2 className="font-heading text-2xl font-semibold text-forest">BCND Ledenportaal</h2>
+        <p className="text-sm text-neutral-500 mt-2 mb-6">Log in met uw account om uw bijscholingen en jaarformulier te beheren.</p>
+        <a href={IS_WP ? window.BCND.loginUrl : "/login"}
+          className="inline-flex items-center justify-center w-full rounded-md bg-forest hover:bg-forest-hover text-white px-4 py-2.5 text-sm transition-colors"
+          data-testid="wp-login-link">
+          Inloggen
+        </a>
+      </div>
     </div>
   );
 }
@@ -28,7 +50,7 @@ function Loading() {
 function Protected({ role, children }) {
   const { user } = useAuth();
   if (user === null) return <Loading />;
-  if (!user) return <Navigate to="/login" replace />;
+  if (!user) return IS_WP ? <LoginPrompt /> : <Navigate to="/login" replace />;
   if (role === "admin" && user.role !== "admin") return <Navigate to="/" replace />;
   if (role === "member" && user.role === "admin") return <Navigate to="/admin" replace />;
   return <AppLayout>{children}</AppLayout>;
@@ -38,13 +60,13 @@ function LoginRoute() {
   const { user } = useAuth();
   if (user === null) return <Loading />;
   if (user) return <Navigate to={user.role === "admin" ? "/admin" : "/"} replace />;
-  return <Login />;
+  return IS_WP ? <LoginPrompt /> : <Login />;
 }
 
 function App() {
   return (
     <div className="App">
-      <BrowserRouter>
+      <Router>
         <AuthProvider>
           <Toaster position="top-right" richColors />
           <Routes>
@@ -65,7 +87,7 @@ function App() {
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </AuthProvider>
-      </BrowserRouter>
+      </Router>
     </div>
   );
 }

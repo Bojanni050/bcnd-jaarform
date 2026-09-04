@@ -47,5 +47,13 @@ Complete webapplicatie voor de BCND (Beroepsvereniging voor Complementaire en Na
 - P2: WordPress/API-koppeling (lid.bcnd.eu) — kern is API-first, klaar voor uitbreiding.
 - P2: /settings/public echt publiek maken of hernoemen.
 
+## WordPress plugin migration (2026-08-27)
+- ✅ Volledige zelfstandige WordPress-plugin gebouwd: /app/wp-plugin/bcnd-jaarformulier/ → ZIP: /app/bcnd-jaarformulier.zip
+- Backend volledig in PHP (WP is source of truth): eigen tabellen wp_bcnd_* via dbDelta, rollen/capabilities (bcnd_admin/bcnd_member + caps), namespaced REST API /wp-json/bcnd/v1/ met server-side autorisatie + member-isolatie, privé documentopslag (uploads/bcnd-private + .htaccess deny), zelfstandige PDF-generator (Helvetica, geen externe libs), notificaties via wp_mail + in-app, WP-cron deadline-herinneringen, audit trail met old/new value.
+- Frontend: bestaande React-UI hergebruikt, WP-aware gemaakt (window.BCND boot, HashRouter, X-WP-Nonce, WP-login), gecompileerd naar assets/app/ (geen npm nodig in productie). Shortcode [bcnd_portal] + WP-adminmenu BCND met secties.
+- Geverifieerd in dev-omgeving: alle PHP `php -l` OK, normberekening (jr1=0/10 t/m jr4+=8/40) getest, PDF visueel gerenderd (matcht BCND-formulier), React dev-app compileert nog.
+- NIET getest op echte WordPress-installatie (geen WP-runtime in deze omgeving). Installeer op een schone WP-site en doorloop de end-to-end flow.
+
 ## Next tasks
-- Zie backlog P1 items eerst (herinneringen + e-mail) indien gewenst.
+- Installeer /app/bcnd-jaarformulier.zip op een echte WordPress-site en valideer de end-to-end flow.
+- Zie backlog P1 items (herinneringen + e-mail) indien gewenst.

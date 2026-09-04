@@ -1,13 +1,17 @@
 import { createContext, useContext, useEffect, useState, useCallback } from "react";
-import api, { formatApiError } from "@/lib/api";
+import api, { formatApiError, IS_WP } from "@/lib/api";
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null); // null=checking, false=anon, obj=auth
+  const [user, setUser] = useState(IS_WP ? (window.BCND.currentUser || false) : null);
   const [error, setError] = useState("");
 
   const check = useCallback(async () => {
+    if (IS_WP) {
+      setUser(window.BCND.currentUser || false);
+      return;
+    }
     try {
       const { data } = await api.get("/auth/me");
       setUser(data);
@@ -16,10 +20,14 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
-  useEffect(() => { check(); }, [check]);
+  useEffect(() => { if (!IS_WP) check(); }, [check]);
 
   const login = async (email, password) => {
     setError("");
+    if (IS_WP) {
+      window.location.href = window.BCND.loginUrl;
+      return;
+    }
     try {
       const { data } = await api.post("/auth/login", { email, password });
       setUser(data);
@@ -32,6 +40,10 @@ export function AuthProvider({ children }) {
   };
 
   const logout = async () => {
+    if (IS_WP) {
+      window.location.href = window.BCND.logoutUrl;
+      return;
+    }
     try { await api.post("/auth/logout"); } catch (e) {}
     setUser(false);
   };

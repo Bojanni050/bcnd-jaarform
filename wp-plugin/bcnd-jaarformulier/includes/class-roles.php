@@ -22,13 +22,13 @@ class BCND_Roles {
         remove_role('bcnd_admin');
         add_role('bcnd_admin', 'BCND Administrator', $admin_caps);
 
-        // BCND member (Licentielid).
-        if (!get_role('bcnd_member')) {
-            add_role('bcnd_member', 'BCND Licentielid', ['read' => true, 'bcnd_member' => true]);
+        // BCND licensed member (Licentielid).
+        if (!get_role('bcnd_licensed')) {
+            add_role('bcnd_licensed', 'BCND Licentielid', ['read' => true, 'bcnd_licensed' => true]);
         } else {
-            $r = get_role('bcnd_member');
+            $r = get_role('bcnd_licensed');
             $r->add_cap('read');
-            $r->add_cap('bcnd_member');
+            $r->add_cap('bcnd_licensed');
         }
 
         // Give every capability to the WordPress administrator as well.

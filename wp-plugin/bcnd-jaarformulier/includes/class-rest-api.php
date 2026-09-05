@@ -44,6 +44,11 @@ class BCND_REST_API {
             ['methods' => 'GET', 'callback' => ['BCND_Members', 'get_one'], 'permission_callback' => function () { return current_user_can('bcnd_manage_members') || self::is_admin(); }],
             ['methods' => 'PUT', 'callback' => ['BCND_Members', 'update_one'], 'permission_callback' => function () { return current_user_can('bcnd_manage_members') || self::is_admin(); }],
         ]);
+        // One-time: link existing WP "Licentielid" accounts to a bcnd_members row + role.
+        register_rest_route($ns, '/members/migrate-legacy', [
+            'methods' => 'POST', 'callback' => ['BCND_Members', 'migrate_legacy'],
+            'permission_callback' => [__CLASS__, 'is_admin'],
+        ]);
 
         // Trainings
         register_rest_route($ns, '/trainings', [

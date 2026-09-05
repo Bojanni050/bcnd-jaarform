@@ -7,11 +7,23 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
-import { Loader2, Save, Settings as SettingsIcon } from "lucide-react";
+import { Loader2, Save, Settings as SettingsIcon, Users } from "lucide-react";
 
 export default function AdminSettings() {
   const [s, setS] = useState(null);
   const [busy, setBusy] = useState(false);
+  const [migrating, setMigrating] = useState(false);
+  const [migrateReport, setMigrateReport] = useState(null);
+
+  const runMigration = async () => {
+    setMigrating(true);
+    try {
+      const { data } = await api.post("/members/migrate-legacy", {});
+      setMigrateReport(data);
+      toast.success(`${data.gemigreerd.length} lid(en) gekoppeld`);
+    } catch (e) { toast.error(e.response?.data?.detail || "Mislukt"); }
+    finally { setMigrating(false); }
+  };
 
   useEffect(() => { api.get("/settings").then(({ data }) => setS(data)).catch(() => {}); }, []);
   if (!s) return <div className="py-20 flex justify-center"><Loader2 className="h-6 w-6 animate-spin text-forest" /></div>;
@@ -103,6 +115,35 @@ export default function AdminSettings() {
       <Button className="bg-forest hover:bg-forest-hover text-white" data-testid="save-settings-button" disabled={busy} onClick={save}>
         {busy ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />} Instellingen opslaan
       </Button>
+
+      <Card className="p-6 border-neutral-200 space-y-3">
+        <h3 className="font-heading font-semibold text-forest flex items-center gap-2"><Users className="h-4 w-4" /> Bestaande leden koppelen</h3>
+        <p className="text-sm text-neutral-600">
+          Eenmalige actie: koppelt bestaande WordPress-accounts met lidmaatschap "Licentielid" aan het
+          jaarformulier-portaal (rol + koppelrecord). Er wordt niets van hun profiel gekopieerd — dat blijft
+          gewoon bij de gebruiker staan. Al gekoppelde leden worden overgeslagen, dus dit kan veilig
+          meerdere keren gedraaid worden.
+        </p>
+        <Button variant="outline" data-testid="migrate-legacy-button" disabled={migrating} onClick={runMigration}>
+          {migrating && <Loader2 className="h-4 w-4 mr-2 animate-spin" />} Koppel bestaande licentieleden
+        </Button>
+        {migrateReport && (
+          <div className="text-sm text-neutral-700 space-y-2 pt-2 border-t border-neutral-100">
+            <p><strong>{migrateReport.total_licentieleden_gevonden}</strong> licentieleden gevonden op basis van "Lidmaatschap".</p>
+            <p className="text-green-700"><strong>{migrateReport.gemigreerd.length}</strong> nieuw gekoppeld.</p>
+            {migrateReport.gemigreerd.length > 0 && (
+              <ul className="list-disc list-inside text-xs text-neutral-500 max-h-40 overflow-y-auto">
+                {migrateReport.gemigreerd.map((m) => (
+                  <li key={m.user_id}>{m.name} ({m.email}) — lidnummer {m.member_number || "—"}, licentie sinds {m.license_since || "onbekend"}</li>
+                ))}
+              </ul>
+            )}
+            {migrateReport.overgeslagen.length > 0 && (
+              <p className="text-neutral-400 text-xs">{migrateReport.overgeslagen.length} overgeslagen (al gekoppeld of account ontbreekt).</p>
+            )}
+          </div>
+        )}
+      </Card>
     </div>
   );
 }

@@ -39,7 +39,10 @@ class BCND_Members {
         $q = sanitize_text_field($req->get_param('q'));
         if ($q) {
             $like = '%' . $wpdb->esc_like($q) . '%';
-            $where .= ' AND (name LIKE %s OR email LIKE %s OR member_number LIKE %s)';
+            // member_number (lidnummer) lives on the WP user, not this table.
+            $where .= " AND (name LIKE %s OR email LIKE %s OR user_id IN (
+                SELECT user_id FROM {$wpdb->usermeta} WHERE meta_key = 'lidnummer' AND meta_value LIKE %s
+            ))";
             array_push($args, $like, $like, $like);
         }
         $sql = "SELECT * FROM $t WHERE $where ORDER BY name ASC";
@@ -72,9 +75,13 @@ class BCND_Members {
             'user_email' => $email,
             'user_pass' => $password,
             'display_name' => $name,
-            'role' => 'bcnd_member',
+            'role' => 'bcnd_licensed',
         ]);
         if (is_wp_error($uid)) { return $uid; }
+
+        // Lidnummer and licentiedatum live on the WP user (JetEngine fields), not here.
+        update_user_meta($uid, 'lidnummer', sanitize_text_field($req->get_param('member_number')));
+        update_user_meta($uid, 'license_since', $license);
 
         $now = BCND_Core::now();
         $wpdb->insert(BCND_Database::t('members'), [
@@ -84,8 +91,6 @@ class BCND_Members {
             'address' => sanitize_text_field($req->get_param('address')),
             'city' => sanitize_text_field($req->get_param('city')),
             'postal_code' => sanitize_text_field($req->get_param('postal_code')),
-            'member_number' => sanitize_text_field($req->get_param('member_number')),
-            'license_since' => $license,
             'phone' => sanitize_text_field($req->get_param('phone')),
             'status' => 'active',
             'notes' => '',
@@ -102,17 +107,87 @@ class BCND_Members {
         $id = (int) $req['id'];
         $existing = BCND_Core::get_member($id);
         if (!$existing) { return new WP_Error('bcnd_not_found', 'Lid niet gevonden', ['status' => 404]); }
-        $allowed = ['name', 'address', 'city', 'postal_code', 'member_number', 'license_since', 'phone', 'status', 'notes'];
+
+        // Lidnummer and licentiedatum live on the WP user (JetEngine fields), not here.
+        $meta_changed = false;
+        $member_number = $req->get_param('member_number');
+        if ($member_number !== null) {
+            update_user_meta($existing['user_id'], 'lidnummer', sanitize_text_field($member_number));
+            $meta_changed = true;
+        }
+        $license_since = $req->get_param('license_since');
+        if ($license_since !== null) {
+            update_user_meta($existing['user_id'], 'license_since', sanitize_text_field($license_since));
+            $meta_changed = true;
+        }
+
+        $allowed = ['name', 'address', 'city', 'postal_code', 'phone', 'status', 'notes'];
         $data = self::collect($req, $allowed);
-        if (!$data) { return new WP_Error('bcnd_invalid', 'Geen wijzigingen', ['status' => 400]); }
-        $data['updated_at'] = BCND_Core::now();
-        $wpdb->update(BCND_Database::t('members'), $data, ['id' => $id]);
+        if (!$data && !$meta_changed) { return new WP_Error('bcnd_invalid', 'Geen wijzigingen', ['status' => 400]); }
+        if ($data) {
+            $data['updated_at'] = BCND_Core::now();
+            $wpdb->update(BCND_Database::t('members'), $data, ['id' => $id]);
+        }
         if (isset($data['name'])) {
             $u = get_userdata($existing['user_id']);
             if ($u) { wp_update_user(['ID' => $existing['user_id'], 'display_name' => $data['name']]); }
         }
         BCND_Audit_Log::add('member', $id, 'lid_gewijzigd', ['old' => $existing, 'new' => $data]);
         return rest_ensure_response(BCND_Core::get_member($id));
+    }
+
+    /**
+     * One-time migration: link existing WordPress accounts (JetEngine
+     * "Licentielid" members) to a bcnd_members row and grant the
+     * bcnd_licensed role, without touching or copying their JetEngine data.
+     * Safe to run more than once — already-linked users are skipped.
+     */
+    public static function migrate_legacy($req) {
+        global $wpdb;
+        $t = BCND_Database::t('members');
+
+        // JetEngine stores "Lidmaatschap" (type_lid) as a serialized checkbox
+        // array; users with no such meta at all (no JetEngine profile yet)
+        // are excluded by this LIKE match, which is exactly what we want.
+        $user_ids = $wpdb->get_col($wpdb->prepare(
+            "SELECT user_id FROM {$wpdb->usermeta} WHERE meta_key = 'type_lid' AND meta_value LIKE %s",
+            '%"Licentielid"%'
+        ));
+
+        $migrated = []; $skipped = [];
+        foreach ($user_ids as $user_id) {
+            $user_id = (int) $user_id;
+            $existing = $wpdb->get_var($wpdb->prepare("SELECT id FROM $t WHERE user_id = %d", $user_id));
+            if ($existing) {
+                $skipped[] = ['user_id' => $user_id, 'reason' => 'al gekoppeld'];
+                continue;
+            }
+            $u = get_userdata($user_id);
+            if (!$u) {
+                $skipped[] = ['user_id' => $user_id, 'reason' => 'WP-account niet gevonden'];
+                continue;
+            }
+            $now = BCND_Core::now();
+            $wpdb->insert($t, [
+                'user_id' => $user_id,
+                'name' => $u->display_name,
+                'email' => $u->user_email,
+                'address' => '', 'city' => '', 'postal_code' => '', 'phone' => '',
+                'status' => 'active', 'notes' => '',
+                'created_at' => $now, 'updated_at' => $now,
+            ]);
+            $u->add_role('bcnd_licensed');
+            $id = (int) $wpdb->insert_id;
+            BCND_Audit_Log::add('member', $id, 'lid_gemigreerd', ['remark' => 'Gekoppeld vanuit bestaand WP-account']);
+            $migrated[] = ['user_id' => $user_id, 'name' => $u->display_name, 'email' => $u->user_email,
+                'member_number' => BCND_Core::member_number_of($user_id), 'license_since' => BCND_Core::license_since_of($user_id)];
+        }
+
+        return rest_ensure_response([
+            'total_licentieleden_gevonden' => count($user_ids),
+            'gemigreerd' => $migrated,
+            'overgeslagen' => $skipped,
+        ]);
     }
 
     private static function collect($req, $allowed) {

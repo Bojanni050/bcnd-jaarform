@@ -32,8 +32,6 @@ class BCND_Database {
             address VARCHAR(190) NOT NULL DEFAULT '',
             city VARCHAR(120) NOT NULL DEFAULT '',
             postal_code VARCHAR(20) NOT NULL DEFAULT '',
-            member_number VARCHAR(60) NOT NULL DEFAULT '',
-            license_since DATE NULL,
             phone VARCHAR(60) NOT NULL DEFAULT '',
             status VARCHAR(30) NOT NULL DEFAULT 'active',
             notes TEXT NULL,
@@ -41,7 +39,6 @@ class BCND_Database {
             updated_at DATETIME NOT NULL,
             PRIMARY KEY  (id),
             UNIQUE KEY user_id (user_id),
-            KEY member_number (member_number),
             KEY status (status)
         ) $charset;";
 

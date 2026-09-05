@@ -78,6 +78,19 @@ class BCND_Core {
         return $row ? self::format_member($row) : null;
     }
 
+    /**
+     * These live on the WordPress user (JetEngine meta fields on the member's
+     * account), not in our own tables, so there's only one place to edit them.
+     */
+    public static function member_number_of($user_id) {
+        return (string) get_user_meta($user_id, 'lidnummer', true);
+    }
+
+    public static function license_since_of($user_id) {
+        $v = get_user_meta($user_id, 'license_since', true);
+        return $v ? $v : null;
+    }
+
     public static function format_member($row) {
         return [
             'id' => (int) $row['id'],
@@ -87,8 +100,8 @@ class BCND_Core {
             'address' => $row['address'],
             'city' => $row['city'],
             'postal_code' => $row['postal_code'],
-            'member_number' => $row['member_number'],
-            'license_since' => $row['license_since'],
+            'member_number' => self::member_number_of($row['user_id']),
+            'license_since' => self::license_since_of($row['user_id']),
             'phone' => $row['phone'],
             'status' => $row['status'],
             'notes' => isset($row['notes']) ? $row['notes'] : '',

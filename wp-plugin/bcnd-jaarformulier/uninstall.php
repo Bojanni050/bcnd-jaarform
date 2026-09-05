@@ -18,5 +18,5 @@ if (defined('BCND_REMOVE_ALL_DATA') && BCND_REMOVE_ALL_DATA) {
     }
     delete_option('bcnd_settings');
     remove_role('bcnd_admin');
-    remove_role('bcnd_member');
+    remove_role('bcnd_licensed');
 }

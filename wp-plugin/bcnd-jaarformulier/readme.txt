@@ -12,7 +12,7 @@ van bij- en nascholingen, consulten en jaarformulieren van licentieleden.
 * Beheeromgeving onder het WordPress-menu **BCND** (Dashboard, Leden, Bijscholingen, Jaarformulieren, Instellingen).
 * Eigen databasetabellen (wp_bcnd_*), aangemaakt via dbDelta bij activatie/upgrade.
 * Namespaced REST API onder `/wp-json/bcnd/v1/` met server-side autorisatie.
-* Rollen/capabilities: BCND Administrator (bcnd_admin) en BCND Licentielid (bcnd_member).
+* Rollen/capabilities: BCND Administrator (bcnd_admin) en BCND Licentielid (bcnd_licensed).
 * PDF-generatie van het jaarformulier (zonder externe libraries).
 * Notificaties via wp_mail + in-app inbox. Herinneringen via WP-cron.
 * Documenten (deelnamebewijzen) worden privé opgeslagen buiten publieke URL's en

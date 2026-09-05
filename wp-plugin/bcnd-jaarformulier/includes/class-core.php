@@ -91,18 +91,43 @@ class BCND_Core {
         return $v ? $v : null;
     }
 
+    public static function street_of($user_id) {
+        return (string) get_user_meta($user_id, 'straat', true);
+    }
+
+    public static function house_number_of($user_id) {
+        return (string) get_user_meta($user_id, 'huisnummer', true);
+    }
+
+    public static function postal_code_of($user_id) {
+        return (string) get_user_meta($user_id, 'postcode', true);
+    }
+
+    public static function city_of($user_id) {
+        return (string) get_user_meta($user_id, 'plaats', true);
+    }
+
+    public static function phone_of($user_id) {
+        return (string) get_user_meta($user_id, 'telefoon', true);
+    }
+
     public static function format_member($row) {
+        $uid = $row['user_id'];
+        $street = self::street_of($uid);
+        $house_number = self::house_number_of($uid);
         return [
             'id' => (int) $row['id'],
-            'user_id' => (int) $row['user_id'],
+            'user_id' => (int) $uid,
             'name' => $row['name'],
             'email' => $row['email'],
-            'address' => $row['address'],
-            'city' => $row['city'],
-            'postal_code' => $row['postal_code'],
-            'member_number' => self::member_number_of($row['user_id']),
-            'license_since' => self::license_since_of($row['user_id']),
-            'phone' => $row['phone'],
+            'street' => $street,
+            'house_number' => $house_number,
+            'address' => trim($street . ' ' . $house_number),
+            'city' => self::city_of($uid),
+            'postal_code' => self::postal_code_of($uid),
+            'member_number' => self::member_number_of($uid),
+            'license_since' => self::license_since_of($uid),
+            'phone' => self::phone_of($uid),
             'status' => $row['status'],
             'notes' => isset($row['notes']) ? $row['notes'] : '',
         ];

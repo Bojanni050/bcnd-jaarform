@@ -14,7 +14,7 @@ import { Loader2, Users, Plus, UserPlus } from "lucide-react";
 
 const emptyNew = {
   name: "", email: "", password: "", member_number: "", license_since: "",
-  address: "", postal_code: "", city: "", phone: "", status: "active",
+  street: "", house_number: "", postal_code: "", city: "", phone: "", status: "active",
 };
 
 export default function AdminMembers() {
@@ -44,7 +44,8 @@ export default function AdminMembers() {
     setBusy(true);
     try {
       await api.put(`/members/${edit.id}`, {
-        name: edit.name, address: edit.address, city: edit.city, postal_code: edit.postal_code,
+        name: edit.name, street: edit.street, house_number: edit.house_number,
+        city: edit.city, postal_code: edit.postal_code,
         member_number: edit.member_number, license_since: edit.license_since, phone: edit.phone,
         status: edit.status, notes: edit.notes,
       });
@@ -78,7 +79,8 @@ export default function AdminMembers() {
                 <F label="Lidnummer BCND"><Input data-testid="nm-number" value={nm.member_number} onChange={(e) => setNm({ ...nm, member_number: e.target.value })} /></F>
                 <F label="Licentielid sinds *"><Input type="date" data-testid="nm-license" value={nm.license_since} onChange={(e) => setNm({ ...nm, license_since: e.target.value })} /></F>
                 <F label="Telefoon"><Input data-testid="nm-phone" value={nm.phone} onChange={(e) => setNm({ ...nm, phone: e.target.value })} /></F>
-                <F label="Adres"><Input data-testid="nm-address" value={nm.address} onChange={(e) => setNm({ ...nm, address: e.target.value })} /></F>
+                <F label="Straat"><Input data-testid="nm-street" value={nm.street} onChange={(e) => setNm({ ...nm, street: e.target.value })} /></F>
+                <F label="Huisnummer"><Input data-testid="nm-house-number" value={nm.house_number} onChange={(e) => setNm({ ...nm, house_number: e.target.value })} /></F>
                 <F label="Postcode"><Input data-testid="nm-postal" value={nm.postal_code} onChange={(e) => setNm({ ...nm, postal_code: e.target.value })} /></F>
                 <F label="Plaats"><Input data-testid="nm-city" value={nm.city} onChange={(e) => setNm({ ...nm, city: e.target.value })} /></F>
               </div>
@@ -138,7 +140,10 @@ export default function AdminMembers() {
               <F label="Naam"><Input data-testid="em-name" value={edit.name || ""} onChange={(e) => setEdit({ ...edit, name: e.target.value })} /></F>
               <F label="Lidnummer BCND"><Input data-testid="em-number" value={edit.member_number || ""} onChange={(e) => setEdit({ ...edit, member_number: e.target.value })} /></F>
               <F label="Licentielid sinds"><Input type="date" data-testid="em-license" value={(edit.license_since || "").slice(0, 10)} onChange={(e) => setEdit({ ...edit, license_since: e.target.value })} /></F>
-              <F label="Adres"><Input value={edit.address || ""} onChange={(e) => setEdit({ ...edit, address: e.target.value })} /></F>
+              <div className="grid grid-cols-2 gap-3">
+                <F label="Straat"><Input value={edit.street || ""} onChange={(e) => setEdit({ ...edit, street: e.target.value })} /></F>
+                <F label="Huisnummer"><Input value={edit.house_number || ""} onChange={(e) => setEdit({ ...edit, house_number: e.target.value })} /></F>
+              </div>
               <div className="grid grid-cols-2 gap-3">
                 <F label="Postcode"><Input value={edit.postal_code || ""} onChange={(e) => setEdit({ ...edit, postal_code: e.target.value })} /></F>
                 <F label="Plaats"><Input value={edit.city || ""} onChange={(e) => setEdit({ ...edit, city: e.target.value })} /></F>

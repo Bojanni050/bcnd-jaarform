@@ -18,7 +18,9 @@ export default function Profile() {
   const save = async () => {
     setSaving(true);
     try {
-      await api.put("/members/me", { address: m.address, city: m.city, postal_code: m.postal_code, phone: m.phone });
+      await api.put("/members/me", {
+        street: m.street, house_number: m.house_number, city: m.city, postal_code: m.postal_code, phone: m.phone,
+      });
       toast.success("Profiel bijgewerkt");
     } catch (e) { toast.error(e.response?.data?.detail || "Opslaan mislukt"); }
     finally { setSaving(false); }
@@ -47,7 +49,8 @@ export default function Profile() {
           <ReadOnly label="Licentielid sinds" value={formatDate(m.license_since)} />
           <ReadOnly label="Accountstatus" value={m.status === "active" ? "Actief" : m.status} />
           <ReadOnly label="Naam" value={m.name} />
-          <Editable label="Adres" value={m.address} onChange={(v) => setM({ ...m, address: v })} testid="profile-address" />
+          <Editable label="Straat" value={m.street} onChange={(v) => setM({ ...m, street: v })} testid="profile-street" />
+          <Editable label="Huisnummer" value={m.house_number} onChange={(v) => setM({ ...m, house_number: v })} testid="profile-house-number" />
           <Editable label="Postcode" value={m.postal_code} onChange={(v) => setM({ ...m, postal_code: v })} testid="profile-postal" />
           <Editable label="Plaats" value={m.city} onChange={(v) => setM({ ...m, city: v })} testid="profile-city" />
           <Editable label="Telefoon" value={m.phone} onChange={(v) => setM({ ...m, phone: v })} testid="profile-phone" />

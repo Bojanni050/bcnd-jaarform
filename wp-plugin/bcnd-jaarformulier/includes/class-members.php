@@ -3,6 +3,35 @@ if (!defined('ABSPATH')) { exit; }
 
 class BCND_Members {
 
+    /**
+     * These fields live on the WP user (JetEngine meta), not in bcnd_members,
+     * so there's only one place to edit them. Maps our REST field name to the
+     * JetEngine meta key.
+     */
+    const SELF_EDITABLE_META = [
+        'street' => 'straat',
+        'house_number' => 'huisnummer',
+        'postal_code' => 'postcode',
+        'city' => 'plaats',
+        'phone' => 'telefoon',
+    ];
+    const ADMIN_ONLY_META = [
+        'member_number' => 'lidnummer',
+        'license_since' => 'license_since',
+    ];
+
+    private static function write_meta_fields($req, $user_id, $map) {
+        $changed = false;
+        foreach ($map as $field => $meta_key) {
+            $v = $req->get_param($field);
+            if ($v !== null) {
+                update_user_meta($user_id, $meta_key, sanitize_text_field($v));
+                $changed = true;
+            }
+        }
+        return $changed;
+    }
+
     /** Resolve the member row of the current user or 403. */
     public static function current_or_error() {
         $m = BCND_Core::member_for_user(get_current_user_id());
@@ -18,15 +47,9 @@ class BCND_Members {
     }
 
     public static function update_me($req) {
-        global $wpdb;
         $m = self::current_or_error();
         if (is_wp_error($m)) { return $m; }
-        $allowed = ['address', 'city', 'postal_code', 'phone'];
-        $data = self::collect($req, $allowed);
-        if ($data) {
-            $data['updated_at'] = BCND_Core::now();
-            $wpdb->update(BCND_Database::t('members'), $data, ['id' => $m['id']]);
-        }
+        self::write_meta_fields($req, $m['user_id'], self::SELF_EDITABLE_META);
         return rest_ensure_response(BCND_Core::get_member($m['id']));
     }
 
@@ -79,19 +102,16 @@ class BCND_Members {
         ]);
         if (is_wp_error($uid)) { return $uid; }
 
-        // Lidnummer and licentiedatum live on the WP user (JetEngine fields), not here.
-        update_user_meta($uid, 'lidnummer', sanitize_text_field($req->get_param('member_number')));
-        update_user_meta($uid, 'license_since', $license);
+        // Lidnummer, licentiedatum, adres en telefoon leven op het WP-account
+        // (JetEngine-velden), niet in onze eigen tabel.
+        self::write_meta_fields($req, $uid, self::ADMIN_ONLY_META);
+        self::write_meta_fields($req, $uid, self::SELF_EDITABLE_META);
 
         $now = BCND_Core::now();
         $wpdb->insert(BCND_Database::t('members'), [
             'user_id' => $uid,
             'name' => $name,
             'email' => $email,
-            'address' => sanitize_text_field($req->get_param('address')),
-            'city' => sanitize_text_field($req->get_param('city')),
-            'postal_code' => sanitize_text_field($req->get_param('postal_code')),
-            'phone' => sanitize_text_field($req->get_param('phone')),
             'status' => 'active',
             'notes' => '',
             'created_at' => $now,
@@ -108,20 +128,10 @@ class BCND_Members {
         $existing = BCND_Core::get_member($id);
         if (!$existing) { return new WP_Error('bcnd_not_found', 'Lid niet gevonden', ['status' => 404]); }
 
-        // Lidnummer and licentiedatum live on the WP user (JetEngine fields), not here.
-        $meta_changed = false;
-        $member_number = $req->get_param('member_number');
-        if ($member_number !== null) {
-            update_user_meta($existing['user_id'], 'lidnummer', sanitize_text_field($member_number));
-            $meta_changed = true;
-        }
-        $license_since = $req->get_param('license_since');
-        if ($license_since !== null) {
-            update_user_meta($existing['user_id'], 'license_since', sanitize_text_field($license_since));
-            $meta_changed = true;
-        }
+        $meta_changed = self::write_meta_fields($req, $existing['user_id'], self::ADMIN_ONLY_META);
+        $meta_changed = self::write_meta_fields($req, $existing['user_id'], self::SELF_EDITABLE_META) || $meta_changed;
 
-        $allowed = ['name', 'address', 'city', 'postal_code', 'phone', 'status', 'notes'];
+        $allowed = ['name', 'status', 'notes'];
         $data = self::collect($req, $allowed);
         if (!$data && !$meta_changed) { return new WP_Error('bcnd_invalid', 'Geen wijzigingen', ['status' => 400]); }
         if ($data) {
@@ -172,7 +182,6 @@ class BCND_Members {
                 'user_id' => $user_id,
                 'name' => $u->display_name,
                 'email' => $u->user_email,
-                'address' => '', 'city' => '', 'postal_code' => '', 'phone' => '',
                 'status' => 'active', 'notes' => '',
                 'created_at' => $now, 'updated_at' => $now,
             ]);

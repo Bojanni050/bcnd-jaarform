@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate, useLocation, Link } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import api, { IS_WP } from "@/lib/api";
 import {
   LayoutDashboard, GraduationCap, Stethoscope, FileText, User, LogOut,
-  Users, ClipboardCheck, Settings as SettingsIcon, Bell, Leaf, ShieldCheck,
+  Users, ClipboardCheck, Settings as SettingsIcon, Bell, Leaf, ShieldCheck, ArrowLeftRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -27,8 +27,13 @@ const adminNav = [
 export function AppLayout({ children }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  // Which side of the app we're showing follows the URL, not just the role,
+  // so an admin who is also a licensed member can be on either side.
+  const onAdminSide = location.pathname.startsWith("/admin");
   const isAdmin = user?.role === "admin";
-  const nav = isAdmin ? adminNav : memberNav;
+  const isAlsoMember = isAdmin && !!user?.member_id;
+  const nav = onAdminSide ? adminNav : memberNav;
   const [unread, setUnread] = useState(0);
   const [open, setOpen] = useState(false);
 
@@ -69,10 +74,20 @@ export function AppLayout({ children }) {
           ))}
         </nav>
         <div className="px-4 py-4 border-t border-white/10">
-          {isAdmin && (
+          {onAdminSide && (
             <div className="flex items-center gap-1.5 text-[11px] text-white/50 mb-3">
               <ShieldCheck className="h-3.5 w-3.5" /> Administratie
             </div>
+          )}
+          {isAlsoMember && (
+            <Link
+              to={onAdminSide ? "/" : "/admin"}
+              data-testid="switch-view-link"
+              className="flex items-center gap-1.5 text-xs text-white/70 hover:text-white mb-3"
+            >
+              <ArrowLeftRight className="h-3.5 w-3.5" />
+              {onAdminSide ? "Naar mijn ledenprofiel" : "Naar beheeromgeving"}
+            </Link>
           )}
           <div className="text-sm font-medium truncate">{user?.name}</div>
           <div className="text-xs text-white/50 truncate mb-3">{user?.email}</div>
@@ -91,7 +106,7 @@ export function AppLayout({ children }) {
         <header className="sticky top-0 z-20 bg-white border-b border-neutral-200 px-5 md:px-8 py-3.5 flex items-center justify-between">
           <div className="md:hidden font-heading font-semibold text-forest">BCND</div>
           <div className="hidden md:block text-sm text-neutral-500">
-            {isAdmin ? "Beheeromgeving" : "Ledenomgeving"}
+            {onAdminSide ? "Beheeromgeving" : "Ledenomgeving"}
           </div>
           <div className="relative">
             <button

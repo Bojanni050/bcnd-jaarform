@@ -52,7 +52,9 @@ function Protected({ role, children }) {
   if (user === null) return <Loading />;
   if (!user) return IS_WP ? <LoginPrompt /> : <Navigate to="/login" replace />;
   if (role === "admin" && user.role !== "admin") return <Navigate to="/" replace />;
-  if (role === "member" && user.role === "admin") return <Navigate to="/admin" replace />;
+  // An admin who is *also* a licensed member (has their own member_id) may still
+  // use the member-facing pages for their own bijscholingen/jaarformulier.
+  if (role === "member" && user.role === "admin" && !user.member_id) return <Navigate to="/admin" replace />;
   return <AppLayout>{children}</AppLayout>;
 }
 

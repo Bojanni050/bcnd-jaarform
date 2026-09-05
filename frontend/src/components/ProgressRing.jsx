@@ -7,7 +7,7 @@ export function ProgressRing({ value, max, label, sublabel, complete, size = 140
   const radius = (size - 16) / 2;
   const circ = 2 * Math.PI * radius;
   const offset = circ - (pct / 100) * circ;
-  const color = complete ? "#1E3F33" : pct >= 60 ? "#8A9A86" : "#D97757";
+  const color = complete ? "#064413" : pct >= 60 ? "#6C8C61" : "#D97757";
 
   return (
     <div className="flex flex-col items-center" data-testid={testid}>

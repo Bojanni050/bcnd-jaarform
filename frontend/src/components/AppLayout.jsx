@@ -47,7 +47,7 @@ export function AppLayout({ children }) {
   return (
     <div className="min-h-screen flex">
       {/* Sidebar */}
-      <aside className={`w-64 shrink-0 bg-[#1E3F33] text-white flex-col hidden md:flex ${IS_WP ? "md:sticky md:top-0 md:self-start md:h-screen" : "fixed h-screen"}`}>
+      <aside className={`w-64 shrink-0 bg-[#064413] text-white flex-col hidden md:flex ${IS_WP ? "md:sticky md:top-0 md:self-start md:h-screen" : "fixed h-screen"}`}>
         <div className="px-6 py-6 border-b border-white/10 flex items-center gap-2.5">
           <div className="h-9 w-9 rounded-lg bg-terracotta flex items-center justify-center">
             <Leaf className="h-5 w-5 text-white" />

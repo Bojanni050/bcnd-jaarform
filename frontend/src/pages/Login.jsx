@@ -34,7 +34,7 @@ export default function Login() {
           src="https://images.unsplash.com/photo-1770836037816-4445dbd449fd?crop=entropy&cs=srgb&fm=jpg&q=85&w=1200"
           alt="Dierenarts" className="absolute inset-0 h-full w-full object-cover"
         />
-        <div className="absolute inset-0 bg-[#1E3F33]/70" />
+        <div className="absolute inset-0 bg-[#064413]/70" />
         <div className="relative z-10 h-full flex flex-col justify-between p-12 text-white">
           <div className="flex items-center gap-2.5">
             <div className="h-10 w-10 rounded-lg bg-terracotta flex items-center justify-center">

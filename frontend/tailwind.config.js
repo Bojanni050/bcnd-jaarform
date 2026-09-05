@@ -29,8 +29,8 @@ module.exports = {
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',
-        forest: { DEFAULT: '#1E3F33', hover: '#2C5C4B', 900: '#16302708' },
-        sage: { DEFAULT: '#8A9A86', hover: '#778773' },
+        forest: { DEFAULT: '#064413', hover: '#3D6D47', 900: '#16302708' },
+        sage: { DEFAULT: '#6C8C61', hover: '#829D79' },
         terracotta: { DEFAULT: '#D97757', hover: '#C06548' },
         bone: '#F9F9F6',
         neutral: {

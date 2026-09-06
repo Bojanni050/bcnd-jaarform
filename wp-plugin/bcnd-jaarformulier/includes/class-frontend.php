@@ -11,6 +11,7 @@ class BCND_Frontend {
 
     public static function init() {
         add_shortcode('bcnd_portal', [__CLASS__, 'shortcode']);
+        add_shortcode('bcnd_welkom', [__CLASS__, 'welcome_shortcode']);
     }
 
     private static function app_base() {
@@ -83,6 +84,16 @@ class BCND_Frontend {
     public static function shortcode($atts) {
         self::enqueue('member', '/');
         return '<div id="bcnd-portal-root" class="bcnd-app-root"></div>';
+    }
+
+    /**
+     * [bcnd_welkom] - "Welkom, {naam}!" for the logged-in visitor. Empty for guests.
+     */
+    public static function welcome_shortcode($atts) {
+        if (!is_user_logged_in()) { return ''; }
+        $name = esc_html(wp_get_current_user()->display_name);
+        return '<div class="bcnd-welkom" style="font-family:\'Work Sans\',sans-serif;font-weight:600;'
+            . 'font-size:16px;color:#064413;">Welkom, ' . $name . '!</div>';
     }
 
     /* ---------- WP admin ---------- */

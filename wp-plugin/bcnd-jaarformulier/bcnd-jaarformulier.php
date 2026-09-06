@@ -2,7 +2,7 @@
 /**
  * Plugin Name: BCND Jaarformulier & Nascholingsadministratie
  * Description: Zelfstandige administratie voor bij- en nascholingen, consulten en jaarformulieren van BCND licentieleden. Bevat ledenportaal (shortcode [bcnd_portal]) en een beheeromgeving met REST API, eigen database, PDF-generatie en notificaties.
- * Version: 1.0.0
+ * Version: 1.3.0
  * Author: BCND
  * Text Domain: bcnd-jaarformulier
  * Requires at least: 6.0
@@ -11,7 +11,7 @@
 
 if (!defined('ABSPATH')) { exit; }
 
-define('BCND_VERSION', '1.2.0');
+define('BCND_VERSION', '1.3.0');
 define('BCND_DB_VERSION', '1.2.0');
 define('BCND_PLUGIN_FILE', __FILE__);
 define('BCND_PLUGIN_DIR', plugin_dir_path(__FILE__));

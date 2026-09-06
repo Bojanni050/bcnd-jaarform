@@ -22,6 +22,9 @@ class BCND_Roles {
         remove_role('bcnd_admin');
         add_role('bcnd_admin', 'BCND Administrator', $admin_caps);
 
+        // Remove the pre-rename role slug (superseded by bcnd_licensed).
+        remove_role('bcnd_member');
+
         // BCND licensed member (Licentielid).
         if (!get_role('bcnd_licensed')) {
             add_role('bcnd_licensed', 'BCND Licentielid', ['read' => true, 'bcnd_licensed' => true]);
